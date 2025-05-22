@@ -49,3 +49,51 @@ class CNNTorch(nn.Module):
         return x
 
 # %%
+import torch.optim as optim
+
+# initialize model and move to device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = CNNTorch().to(device)
+
+# using Adam optimizer and cross entropy loss function
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.CrossEntropyLoss()
+
+# training loop 
+epochs = 5
+for epoch in range(epochs):
+    model.train()
+    running_loss = 0.0
+
+    for images, labels in train_loader:
+        images, labels = images.to(device), labels.to(device)
+
+        # pass images through model to get outputs forward pass
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+
+        # backpropagating the loss and updating the weights 
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+    print(f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss:.4f}")
+
+# %%
+# testing the model
+model.eval()  # set model to eval mode to disable gradient tracking
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        images, labels = images.to(device), labels.to(device)
+        outputs = model(images)
+        _, predicted = torch.max(outputs, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+# Test Accuracy was: 90.51%
+print(f"Test Accuracy: {100 * correct / total:.2f}%")# %%
