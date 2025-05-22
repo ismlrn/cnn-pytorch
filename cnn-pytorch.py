@@ -97,3 +97,20 @@ with torch.no_grad():
 
 # Test Accuracy was: 90.51%
 print(f"Test Accuracy: {100 * correct / total:.2f}%")# %%
+# %%
+# save the model weights only to reload later
+torch.save(model.state_dict(), f"data/fashion_cnn_weights_{epochs}.pth")
+
+# %%
+# load the model
+# model = CNNTorch()
+# model.load_state_dict(torch.load("data/fashion_cnn_weights.pth"))
+# model.eval()
+
+# %%
+# for saving the model, you can save the entire model too
+# torch.save(model, f"data/fashion_cnn_model_{epochs}.pth")
+# model = torch.load("data/fashion_cnn_model_{epochs}.pth")
+# model.eval()
+
+# %%
