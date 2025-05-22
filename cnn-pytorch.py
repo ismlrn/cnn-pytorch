@@ -114,3 +114,78 @@ torch.save(model.state_dict(), f"data/fashion_cnn_weights_{epochs}.pth")
 # model.eval()
 
 # %%
+# import matplotlib.pyplot as plt
+
+# # an example image
+# images, _ = next(iter(test_loader))
+# img = images[0].unsqueeze(0).to(device)  # shape: (1, 1, 28, 28)
+
+# # hook to grab outputs
+# activation = {}
+
+# def get_activation(name):
+#     def hook(model, input, output):
+#         activation[name] = output.detach()
+#     return hook
+
+# # hooks to grab outputs from conv1 and conv2
+# model.conv1.register_forward_hook(get_activation('conv1'))
+# model.conv2.register_forward_hook(get_activation('conv2'))
+# _ = model(img)
+
+# # plot feature maps from conv1
+# act = activation['conv2'].squeeze()  # shape: (16, 28, 28)
+# fig, axarr = plt.subplots(4, 4, figsize=(8, 8))
+# for idx in range(16):
+#     axarr[idx//4, idx%4].imshow(act[idx].cpu(), cmap='gray')
+#     axarr[idx//4, idx%4].axis('off')
+# plt.suptitle("Conv2 Feature Maps")
+# plt.show()
+
+# # %%
+# # plot the weights of conv1: shape = (out_channels, in_channels, k, k)
+# filters = model.conv1.weight.data.clone().cpu()
+
+# fig, axarr = plt.subplots(4, 4, figsize=(8, 8))
+# for idx in range(16):
+#     axarr[idx//4, idx%4].imshow(filters[idx][0], cmap='gray')  # single input channel
+#     axarr[idx//4, idx%4].axis('off')
+# plt.suptitle("Conv1 Filters (Weights)")
+# plt.show()
+
+# # %%
+# from torchcam.methods import GradCAM
+# from torchvision.transforms.functional import to_pil_image
+# import matplotlib.pyplot as plt
+
+# # an image and label
+# images, labels = next(iter(test_loader))
+# img = images[0].unsqueeze(0).to(device)
+# # enable gradients for inference
+# model.eval()
+
+# # initialize GradCAM on final conv layer
+# cam_extractor = GradCAM(model, target_layer='conv2')
+# # forward pass
+# out = model(img)
+# pred_class = out.argmax().item()
+
+# # generate CAM for predicted class
+# activation_map = cam_extractor(pred_class, out)
+
+# # overlay the heatmap
+# heatmap = activation_map[0].squeeze().cpu()
+# input_image = img.squeeze().cpu()
+
+# plt.figure(figsize=(10, 4))
+# plt.subplot(1, 2, 1)
+# plt.imshow(input_image, cmap="gray")
+# plt.title("Input Image")
+
+# plt.subplot(1, 2, 2)
+# plt.imshow(input_image, cmap="gray")
+# plt.imshow(heatmap, cmap="jet", alpha=0.5)
+# plt.title(f"Grad-CAM: Class {pred_class}")
+# plt.show()
+
+# %%
